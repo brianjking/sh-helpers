@@ -1,0 +1,119 @@
+#!/usr/bin/env python
+
+# pt - pivot file over a command
+
+# Copyright (c) 2015 Jason Schulz <https://github.com/uxcn>
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#  
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+# author: jason
+
+import sys
+
+import os
+import os.path
+
+import shutil
+import tempfile
+import subprocess
+
+__program__ = 'pt'
+__version__ = '0.1'
+__author__  = 'Jason Schulz'
+__doc__     = 'pt <cmd> [args...] <f> [-p <pivot>]'
+
+c = sys.argv[0]
+
+def usage():
+    print(__doc__)
+    sys.exit(1)
+
+def on_error(e, x=1):
+    if not e is None:
+        print('%s: %s' % (c, e), file=sys.stderr)
+
+    sys.exit(x)
+
+if len(sys.argv) < 3:
+    usage()
+
+pd = None
+
+if sys.argv[1] == '-p':
+
+    pd = sys.argv[2]
+
+    del sys.argv[1:3]
+
+if sys.argv[-2] == '-p':
+
+    pd = sys.argv[-1]
+
+    del sys.argv[-2:]
+
+pca = sys.argv[1:]
+
+pf = sys.argv[-1]
+pfa = os.path.abspath(pf)
+
+if pd is None:
+    pd = os.path.dirname(pfa)
+
+if not os.path.exists(pfa):
+    on_error('no such file or directory (%s)' % pf)
+
+if not os.access(pfa, os.R_OK) or not os.access(pfa, os.W_OK):
+    on_error('permission denied (%s)' % pf)
+
+try:
+
+    (ptf, pt) = tempfile.mkstemp(prefix='pt.', dir=pd)
+
+except OSError as e:
+
+    on_error(e.strerror)
+
+try:
+
+    shutil.copystat(pfa, pt)
+
+except OSError as e:
+
+    os.close(ptf)
+    os.unlink(pt)
+
+    on_error(e.strerror)
+
+x = subprocess.call(pca, stdout=ptf)
+
+if x is not 0:
+
+    os.close(ptf)
+    os.unlink(pt)
+
+    on_error(None, x)
+
+try:
+
+    shutil.move(pt, pfa)
+
+except OSError as e:
+
+    os.close(ptf)
+    os.unlink(pt)
+
+    on_error('%s (%s -> %s)' % (e.strerror, pt, pfa))
+
+# vim:ft=python:et:ts=4:sts=4:pt=4:tw=80
