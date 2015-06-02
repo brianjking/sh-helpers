@@ -65,6 +65,13 @@ for p in ps:
 
     s = os.lstat(p)
 
+    if os.path.lexists(pm):
+
+        prompt = '%s: overwrite (%s)? ' % (c, pm)
+
+        if input(prompt) not in ['Y', 'y']:
+            continue
+
     if stat.S_ISDIR(s.st_mode):
 
         if r:
@@ -75,12 +82,8 @@ for p in ps:
 
             continue
 
-    if os.path.lexists(pm):
-
-        prompt = '%s: overwrite (%s)? ' % (c, pm)
-
-        if input(prompt) not in ['Y', 'y']:
-            continue
+    if os.path.isdir(pm):
+        on_error('is a directory (%s -> %s)' % (p, pm))
 
     try:
         shutil.copy2(p, pm, follow_symlinks=False)
