@@ -76,6 +76,9 @@ for p in ps:
 
         if r:
             try:
+                if os.path.exists(pm):
+                    shutil.rmtree(pm)
+
                 shutil.copytree(p, pm, symlinks=True)
             except OSError as e:
                 on_error('%s (%s -> %s)' % (e.strerror, p, pm))
