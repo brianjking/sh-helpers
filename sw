@@ -46,9 +46,6 @@ def on_error(e, x=1):
 
     sys.exit(x)
 
-if len(sys.argv) < 3 or len(sys.argv) > 5:
-    usage()
-
 pd = None
 
 if sys.argv[1] == '-p':
@@ -56,6 +53,9 @@ if sys.argv[1] == '-p':
     pd = sys.argv[2]
 
     del sys.argv[1:3]
+
+if len(sys.argv) != 3:
+    usage()
 
 pa = os.path.abspath(sys.argv[1])
 pb = os.path.abspath(sys.argv[2])
