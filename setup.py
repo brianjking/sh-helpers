@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
         url                 = 'https://github.com/uxcn/sh-helpers',
         name                = 'sh-helpers',
-        version             = '0.1',
+        version             = '0.1.1',
         fullname            = 'sh-helpers',
         description         = 'simple patterns for manipulating files and directories in a shell',
         long_description    = '''
@@ -55,6 +55,10 @@ source
 
 versions
 --------
+
+0.1.1 (June, 2015)
+
+* minor bugfixes
 
 0.1 (May, 2015)
 

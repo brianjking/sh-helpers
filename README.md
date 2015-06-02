@@ -40,6 +40,10 @@ sort a file and square the second field
 
 ## versions ##
 
+0.1.1 (June, 2015)
+
+* minor bugfixes
+
 0.1 (May, 2015)
 
 * initial release
