@@ -22,13 +22,15 @@
 
 import sys
 
+import argparse
+
 import os
 import os.path
 
 __program__ = 'pm'
-__version__ = '0.1'
+__version__ = '0.1.2'
 __author__  = 'Jason Schulz'
-__doc__     = 'pm <p> [p...]'
+__doc__     = 'pm [-f] [-i] [-s suffix] path [path ...]'
 
 c = sys.argv[0]
 
@@ -42,21 +44,35 @@ def on_error(e, x=1):
 
     sys.exit(x)
 
-if len(sys.argv) == 1:
-    usage()
+def init(p):
 
-ps = sys.argv[1:]
+    p.add_argument('-f', '--force', default=False, dest='f', action='store_const', const=True, help='force')
+    p.add_argument('-i', '--interactive', default=False, dest='f',action='store_const', const=False, help='interactive')
+    p.add_argument('-s', '--suffix', default="'", dest='s', metavar='suffix', help='suffix')
+
+    p.add_argument('ps', nargs='+', metavar='path', help='paths')
+
+g = argparse.ArgumentParser(add_help=False)
+
+init(g)
+
+a = g.parse_args()
+
+f = a.f
+s = a.s
+
+ps = reversed(a.ps)
 
 for p in ps:
 
     p = os.path.abspath(p)
-    pm = '%s\'' % p
+    pm = '%s%s' % (p, s)
 
     if os.path.lexists(pm):
 
         prompt = '%s: overwrite (%s)? ' % (c, pm)
 
-        if input(prompt) not in ['Y', 'y']:
+        if not f and input(prompt) not in ['Y', 'y']:
             continue
 
     try:

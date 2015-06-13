@@ -30,7 +30,7 @@ import tempfile
 import subprocess
 
 __program__ = 'pt'
-__version__ = '0.1'
+__version__ = '0.1.2'
 __author__  = 'Jason Schulz'
 __doc__     = 'pt <cmd> [args...] <f> [-p <pivot>]'
 

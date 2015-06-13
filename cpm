@@ -22,6 +22,8 @@
 
 import sys
 
+import argparse
+
 import os
 import os.path
 
@@ -29,9 +31,9 @@ import stat
 import shutil
 
 __program__ = 'cpm'
-__version__ = '0.1'
+__version__ = '0.1.2'
 __author__  = 'Jason Schulz'
-__doc__     = 'cpm [-r] <p> [p...]'
+__doc__     = 'cpm [-f] [-i] [-r] [-s suffix] path [path ...]'
 
 c = sys.argv[0]
 r = False
@@ -46,33 +48,42 @@ def on_error(e, x=1):
 
     sys.exit(x)
 
-if len(sys.argv) == 1:
-    usage()
+def init(p):
 
-if sys.argv[1] == '-r':
+    p.add_argument('-f', '--force', default=False, dest='f', action='store_const', const=True, help='force')
+    p.add_argument('-i', '--interactive', default=False, dest='f',action='store_const', const=False, help='interactive')
+    p.add_argument('-r', '--recursive', default=False, dest='r',action='store_const', const=True, help='recursive')
+    p.add_argument('-s', '--suffix', default="'", dest='s', metavar='suffix', help='suffix')
 
-    if len(sys.argv) == 2:
-        usage()
+    p.add_argument('ps', nargs='+', metavar='path', help='paths')
 
-    r = True
+g = argparse.ArgumentParser(add_help=False)
 
-ps = sys.argv[1:] if not r else sys.argv[2:]
+init(g)
+
+a = g.parse_args()
+
+f = a.f
+r = a.r
+s = a.s
+
+ps = reversed(a.ps)
 
 for p in ps:
 
     p = os.path.abspath(p)
-    pm = '%s\'' % p
+    pm = '%s%s' % (p, s)
 
-    s = os.lstat(p)
+    t = os.lstat(p)
 
     if os.path.lexists(pm):
 
         prompt = '%s: overwrite (%s)? ' % (c, pm)
 
-        if input(prompt) not in ['Y', 'y']:
+        if not f and input(prompt) not in ['Y', 'y']:
             continue
 
-    if stat.S_ISDIR(s.st_mode):
+    if stat.S_ISDIR(t.st_mode):
 
         if r:
             try:

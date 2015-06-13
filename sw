@@ -22,6 +22,8 @@
 
 import sys
 
+import argparse
+
 import os
 import os.path
 
@@ -32,7 +34,7 @@ import tempfile
 __program__ = 'sw'
 __version__ = '0.1'
 __author__  = 'Jason Schulz'
-__doc__     = 'sw [-p <pivot>] <a> <b>'
+__doc__     = 'sw [-p pivot] a b'
 
 c = sys.argv[0]
 
@@ -46,19 +48,26 @@ def on_error(e, x=1):
 
     sys.exit(x)
 
-pd = None
+def init(p):
 
-if sys.argv[1] == '-p':
+    p.add_argument('-p', '--pivot', default=None, dest='pd', metavar='pivot', help='pivot')
 
-    pd = sys.argv[2]
+    p.add_argument('a', help='a')
+    p.add_argument('b', help='b')
 
-    del sys.argv[1:3]
+p = argparse.ArgumentParser(add_help=False)
 
-if len(sys.argv) != 3:
-    usage()
+init(p)
 
-pa = os.path.abspath(sys.argv[1])
-pb = os.path.abspath(sys.argv[2])
+r = p.parse_args()
+
+a = r.a
+b = r.b
+
+pd = r.pd
+
+pa = os.path.abspath(a)
+pb = os.path.abspath(b)
 
 if pd is None:
     pd = os.path.dirname(pa)
